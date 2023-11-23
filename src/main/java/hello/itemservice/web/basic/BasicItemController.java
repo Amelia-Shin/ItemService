@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,6 +36,68 @@ public class BasicItemController {
     public String item(@PathVariable long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
+        return "basic/item";
+    }
+
+    // HTTP 메서드로 기능 분리
+    @GetMapping("/add")
+    public String addForm() {
+        return "basic/addForm";
+    }
+
+    //@PostMapping("/add")
+    public String addItemV1(@RequestParam String itemName,
+                       @RequestParam int price,
+                       @RequestParam Integer quantity,
+                       Model model) {
+
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+
+        itemRepository.save(item);
+
+        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    //@PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+        // ModelAttribute 가 아래 Item 객체를 자동으로 만들어 줌
+        /*
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+        */
+        itemRepository.save(item);
+
+        // @ModelAttribute 에 지정한 "item" 이 모델 객체에 알아서 넣어줌
+        // 만약 @ModelAttribute("item2") 라면 model.addAttribute("item2", item) 이렇게 해줘야함
+        // view 에서 받는 데이터를 item2로 같이 맞춰서 써줘야함. (단, 현재 addForm 에서는 데이터를 item으로 받고 있어서 변경X)
+        //model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    //@PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item, Model model) {
+        // ModelAttribute 에 name 속성을 지정하지 않으면 ??
+        // "Item -> item" 으로 Item 객체가 item 으로 ModelAttribute 에 담기게 됨.
+        itemRepository.save(item);
+
+        return "basic/item";
+    }
+
+    @PostMapping("/add")
+    public String addItemV4(Item item) {
+        // ModelAttribute 생략 가능
+        // 생략하게 되면? String, Integer 같은 단순 타입은 RequestParam으로 처리해줄것이고, 객체 같은건 ModelAttribute로 처리해줄것임
+        // 클래스명 Item의 첫 글자가 소문자로 바뀌어 item 으로 ModelAttribute 에 담기게 됨.
+        itemRepository.save(item);
+
         return "basic/item";
     }
 
