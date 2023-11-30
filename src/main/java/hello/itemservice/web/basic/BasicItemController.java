@@ -91,7 +91,7 @@ public class BasicItemController {
         return "basic/item";
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV4(Item item) {
         // ModelAttribute 생략 가능
         // 생략하게 되면? String, Integer 같은 단순 타입은 RequestParam으로 처리해줄것이고, 객체 같은건 ModelAttribute로 처리해줄것임
@@ -99,6 +99,13 @@ public class BasicItemController {
         itemRepository.save(item);
 
         return "basic/item";
+    }
+
+    @PostMapping("/add")
+    public String addItemV5(Item item) {
+        itemRepository.save(item);
+
+        return "redirect:/basic/items/" + item.getId();
     }
 
     @GetMapping("/{itemId}/edit")
